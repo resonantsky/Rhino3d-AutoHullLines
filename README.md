@@ -6,10 +6,10 @@ You can use this script to project any form using fractions, in this case metric
 
 ## ✨ Features
 
-- 🔹 Multi-object selection: Slice multiple hulls in one go
-- 🔹 Modular axis control: Choose slicing direction (X, Y, or Z)
-- 🔹 Dynamic layer naming: Auto-generates layers per hull and axis
-- 🔹 Incremental feedback: Console-driven progress for each hull.
+🔹 Multi-object selection: Project multiple bodies in one go.
+🔹 Modular axis control: Choose slicing direction (X, Y, or Z)
+🔹 Dynamic layer naming: Auto-generates layers per hull and axis
+🔹 Incremental feedback: Console-driven progress for each hull.
 
 ## 🚀 Usage
 
