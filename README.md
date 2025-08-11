@@ -2,7 +2,7 @@
 
 A Rhino Python script for slicing hull geometries into clean sectional contours otherwise known as Hull Lines, Waterlines, Stations and Buttocks.
 
-You can use this script to project any form using fractions of the model boundaries to produce arrays of 3d parametric curves that form the contours.
+You can use this script to project any form using fractions, in this case metric, of the model boundaries to produce arrays of 3d parametric curves that form the contours.
 
 ## ✨ Features
 
