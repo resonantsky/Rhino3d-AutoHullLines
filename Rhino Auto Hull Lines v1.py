@@ -68,6 +68,7 @@ def slice_with_contours(hull_id, axis, step_mm, layer_name, color_rgb):
         if section:
             contours.extend(section)
 
+        #rs.StatusBarProgressMeterShow(f"Slicing {axis}-axis...", total_slices, True)
         update_status(i + 1, total_slices)
         Rhino.RhinoApp.Wait()
 
