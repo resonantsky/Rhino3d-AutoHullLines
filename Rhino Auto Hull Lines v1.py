@@ -95,18 +95,26 @@ def slice_with_contours(hull_id, axis, step_mm, layer_name, color_rgb):
     sc.doc.Views.Redraw()
     Rhino.RhinoApp.Wait()
 
-# 🛠️ Select hull polysurface
-hull_id = rs.GetObject("Select Hull polysurface", rs.filter.polysurface)
-if not hull_id: exit()
+# Select hull polysurface
+# Select multiple hulls
+print("Select hulls to section, press ENTER when ready...")
+object_ids = rs.GetObjects(
+    "Select one or more hulls (polysurfaces) for slicing",
+    filter=rs.filter.polysurface,
+    group=True
+)
+if not object_ids:
+    print("No objects selected. Exiting.")
+    exit()
 
-# 🎛️ Choose axis and step interactively
+# Choose axis and step interactively
 axis = rs.GetString("Choose :", "Stations [X] : Buttocks [Y] : Waterlines [Z]", ["X", "Y", "Z"])
 if not axis: exit()
 
 step_mm = rs.GetReal("Enter datum in millimeters", 1000.0, 1.0, 10000.0)
 if step_mm is None: exit()
 
-# 🎨 Axis-specific layer and color
+# Axis-specific layer and color
 color_map = {
     'X': ("Stations", (255, 0, 0)),     # Red
     'Y': ("Buttocks", (0, 255, 0)),     # Green
@@ -114,4 +122,7 @@ color_map = {
 }
 
 layer_name, color_rgb = color_map[axis]
-slice_with_contours(hull_id, axis, step_mm, layer_name, color_rgb)
+for obj_id in object_ids:
+    print(f"Processing: {rs.ObjectName(obj_id) or 'Unnamed Polysurface'}")
+    slice_with_contours(obj_id, axis, step_mm, layer_name, color_rgb)
+    print("Hull lines generation complete!")
