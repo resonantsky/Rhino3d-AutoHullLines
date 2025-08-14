@@ -4,6 +4,8 @@ A Rhino Python script for slicing hull geometries into clean sectional contours�
 
 This script allows you to project any form using metric fractions of the world origin and model boundaries, generating arrays of 3D parametric curves that define the contours.
 
+Recently updated with another script to project only a single line at a time given a datum based on world origin and model bounds.
+
 ## ✨ Features
 
 🔹 Multi-object selection: Project multiple bodies in one go.
