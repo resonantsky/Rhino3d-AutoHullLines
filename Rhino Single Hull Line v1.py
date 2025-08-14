@@ -1,4 +1,4 @@
-# Rhino Single Hull Line v1 — Ra'anan Ynze de Jong — 2025
+# Rhino Singe v1.4 — Ra'anan Ynze de Jong — 2025
 
 import rhinoscriptsyntax as rs
 import scriptcontext as sc
@@ -12,14 +12,18 @@ def ensure_layer(name, color_rgb):
         rs.AddLayer(name, color_rgb)
     rs.CurrentLayer(name)
 
-def slice_single_contour(hull_id, axis, position_mm, layer_name, color_rgb):
-    """Slice hull at a single absolute position and project the result."""
+def slice_single_contour(hull_id, axis, offset_mm, direction, layer_name, color_rgb):
+    """Slice hull at a single symmetrical offset from centerline and project the result."""
     hull = rs.coercebrep(hull_id)
     if not hull: return
 
-    position_model = rs.UnitScale(Rhino.UnitSystem.Millimeters, rs.UnitSystem()) * position_mm
+    offset_model = rs.UnitScale(Rhino.UnitSystem.Millimeters, rs.UnitSystem()) * offset_mm
+    if offset_model <= 0:
+        print("Invalid offset.")
+        return
 
     idx = {'X':0, 'Y':1, 'Z':2}[axis]
+    position_model = offset_model if direction == "Port" else -offset_model
 
     dir_vector = Rhino.Geometry.Vector3d(0,0,0)
     dir_vector[idx] = 1
@@ -53,7 +57,7 @@ def slice_single_contour(hull_id, axis, position_mm, layer_name, color_rgb):
             attr.ColorSource = Rhino.DocObjects.ObjectColorSource.ColorFromObject
             sc.doc.Objects.AddCurve(projected, attr)
             count += 1
-            print(f"✅ Added line at {round(position_mm, 2)} mm")
+            print(f"✅ Added line at {round(position_model, 2)} model units")
 
     sc.doc.Views.Redraw()
     Rhino.RhinoApp.Wait()
@@ -70,12 +74,18 @@ if not object_ids:
     print("No objects selected. Exiting.")
     exit()
 
-# Choose axis and absolute position
+# Choose axis
 axis = rs.GetString("Choose :", "Stations [X] : Buttocks [Y] : Waterlines [Z]", ["X", "Y", "Z"])
 if not axis: exit()
 
-position_mm = rs.GetReal("Enter absolute slice position in millimeters", 1000.0, -100000.0, 100000.0)
-if position_mm is None: exit()
+# Choose offset and direction
+offset_mm = rs.GetReal("Enter offset from centerline in millimeters", 1000.0, 0.0, 100000.0)
+if offset_mm is None or offset_mm <= 0: exit()
+
+direction = "Port"
+if axis in ["Y", "Z"]:
+    direction = rs.GetString("Direction from centerline", "Port", ["Port", "Starboard"])
+    if not direction: exit()
 
 # Axis-specific layer and color
 color_map = {
@@ -90,5 +100,5 @@ for obj_id in object_ids:
     obj_name = rs.ObjectName(obj_id) or "Hull"
     layer_name = f"{obj_name} {suffix}"
     print(f"Processing: {obj_name}")
-    slice_single_contour(obj_id, axis, position_mm, layer_name, color_rgb)
-    print("Single slice complete.\n")#! python 3
+    slice_single_contour(obj_id, axis, offset_mm, direction, layer_name, color_rgb)
+    print("Single slice complete.\n")
