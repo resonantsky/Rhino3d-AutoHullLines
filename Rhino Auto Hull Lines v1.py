@@ -18,6 +18,49 @@ def update_status(current, total):
     percent = int((current / total) * 100)
     print(f"Sectioning: {percent}% ({current}/{total})")
 
+def get_symmetric_slice_positions(bbox, idx, step_pos, step_neg, axis):
+    """Generate symmetrical slice positions from centerline outward."""
+    max_pos = bbox.Max[idx]
+    max_neg = bbox.Min[idx]
+
+    extent_pos = rs.GetReal(f"Maximum positive extent from {axis}=0", max_pos, 0.0, max_pos)
+    extent_neg = rs.GetReal(f"Maximum negative extent from {axis}=0", abs(max_neg), 0.0, abs(max_neg))
+    if extent_pos is None or extent_neg is None:
+        print("Invalid extents.")
+        return []
+
+    slice_positions = []
+    val = 0.0
+    while val <= extent_pos:
+        slice_positions.append(val)
+        val += step_pos
+
+    val = step_neg
+    while val <= extent_neg:
+        slice_positions.append(-val)
+        val += step_neg
+
+    slice_positions.sort()
+    return slice_positions
+
+def get_linear_slice_positions(bbox, idx, step_model, axis):
+    """Generate linear slice positions from min to max."""
+    min_val = bbox.Min[idx]
+    max_val = bbox.Max[idx]
+    min_val = rs.GetReal(f"Start slicing {axis}-axis from", min_val, min_val, max_val)
+    max_val = rs.GetReal(f"End slicing {axis}-axis at", max_val, min_val, max_val)
+    if min_val is None or max_val is None or max_val <= min_val:
+        print("Invalid range.")
+        return []
+
+    slice_positions = []
+    val = min_val
+    while val <= max_val:
+        slice_positions.append(val)
+        val += step_model
+
+    return slice_positions
+
 def slice_with_contours(hull_id, axis, step_mm, layer_name, color_rgb):
     """Slice hull along axis, project curves, and update status per line."""
     hull = rs.coercebrep(hull_id)
@@ -30,27 +73,23 @@ def slice_with_contours(hull_id, axis, step_mm, layer_name, color_rgb):
 
     bbox = hull.GetBoundingBox(True)
     idx = {'X':0, 'Y':1, 'Z':2}[axis]
-    min_val = bbox.Min[idx]
-    max_val = bbox.Max[idx]
 
-    min_val = rs.GetReal(f"Start slicing {axis}-axis from", min_val, min_val, max_val)
-    max_val = rs.GetReal(f"End slicing {axis}-axis at", max_val, min_val, max_val)
-    if min_val is None or max_val is None or max_val <= min_val:
-        print("Invalid range.")
-        return
-
-    slice_positions = []
-    val = min_val
-    while val <= max_val:
-        slice_positions.append(val)
-        val += step_model
+    # Axis-specific slicing logic
+    if axis == 'Y':
+        slice_positions = get_symmetric_slice_positions(bbox, idx, step_model, step_model, axis)
+    elif axis == 'Z':
+        step_pos = rs.GetReal("Enter positive Z spacing (mm)", step_mm, 1.0, 10000.0)
+        step_neg = rs.GetReal("Enter negative Z spacing (mm)", step_pos, 1.0, 10000.0)
+        step_pos_model = rs.UnitScale(Rhino.UnitSystem.Millimeters, rs.UnitSystem()) * step_pos
+        step_neg_model = rs.UnitScale(Rhino.UnitSystem.Millimeters, rs.UnitSystem()) * step_neg
+        slice_positions = get_symmetric_slice_positions(bbox, idx, step_pos_model, step_neg_model, axis)
+    else:
+        slice_positions = get_linear_slice_positions(bbox, idx, step_model, axis)
 
     total_slices = len(slice_positions)
     if total_slices == 0:
         print("No lines to generate.")
         return
-
-    
 
     dir_vector = Rhino.Geometry.Vector3d(0,0,0)
     dir_vector[idx] = 1
@@ -68,7 +107,6 @@ def slice_with_contours(hull_id, axis, step_mm, layer_name, color_rgb):
         if section:
             contours.extend(section)
 
-        
         update_status(i + 1, total_slices)
         Rhino.RhinoApp.Wait()
 
@@ -96,7 +134,6 @@ def slice_with_contours(hull_id, axis, step_mm, layer_name, color_rgb):
     Rhino.RhinoApp.Wait()
 
 # Select hull polysurface
-# Select multiple hulls
 print("Select hulls to section, press ENTER when ready...")
 object_ids = rs.GetObjects(
     "Select one or more hulls (polysurfaces) for slicing",
@@ -111,7 +148,7 @@ if not object_ids:
 axis = rs.GetString("Choose :", "Stations [X] : Buttocks [Y] : Waterlines [Z]", ["X", "Y", "Z"])
 if not axis: exit()
 
-step_mm = rs.GetReal("Enter datum in millimeters", 1000.0, 1.0, 10000.0)
+step_mm = rs.GetReal("Enter default datum in millimeters", 1000.0, 1.0, 10000.0)
 if step_mm is None: exit()
 
 # Axis-specific layer and color
