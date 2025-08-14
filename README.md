@@ -3,7 +3,7 @@
 A Rhino Python script for projecting hull contours—commonly referred to as Hull Lines, Waterlines, Stations, and Buttocks.
 
 This script allows you to project any polysurface form using metric fractions of the world origin and model boundaries, generating arrays of 3D parametric curves that define the contours.
-In the case of Stations the offset is from 0,0 and your given station count, Waterlines are positive freeboard and negative draft, Buttocks are CL outwards to Port & Starboard.
+In the case of Stations the offset is from 0,0 and station offset, Waterlines are positive freeboard and negative draft, Buttocks are CL outwards to Port & Starboard.
 
 This operates on Rhino open and closed polysurfaces and not on meshes as these curves are parametric.
 
