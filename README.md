@@ -1,10 +1,11 @@
 # 🧭 Rhino3d AutoHullLines - Hull Sectioning Tool - v1
 
-A Rhino Python script for slicing hull geometries into clean sectional contours—commonly referred to as Hull Lines, Waterlines, Stations, and Buttocks.
+A Rhino Python script for projecting hull contours—commonly referred to as Hull Lines, Waterlines, Stations, and Buttocks.
 
 This script allows you to project any form using metric fractions of the world origin and model boundaries, generating arrays of 3D parametric curves that define the contours.
+In the case of Stations the offset is from 0,0 and your given station count, Waterlines are positive freeboard and negative draft, Buttocks are CL outwards to Port & Starboard.
 
-Recently updated with another script to project only a single line at a time given a datum based on world origin and model bounds.
+Included is another script to project only a single line at a time following the same method.
 
 ## ✨ Features
 
