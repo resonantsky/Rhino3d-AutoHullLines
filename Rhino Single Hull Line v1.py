@@ -1,4 +1,4 @@
-# Rhino Single Hull Line — Ra'anan Ynze de Jong — 2025
+# Rhino Single Hull Section Line — Ra'anan Ynze de Jong — 2025
 
 import rhinoscriptsyntax as rs
 import scriptcontext as sc
@@ -79,7 +79,7 @@ axis = rs.GetString("Choose :", "Stations [X] : Buttocks [Y] : Waterlines [Z]", 
 if not axis: exit()
 
 # Choose offset and direction
-offset_mm = rs.GetReal("Enter offset from centerline in millimeters", 1000.0, 0.0, 100000.0)
+offset_mm = rs.GetReal("Enter offset in millimeters", 1000.0, 0.0, 100000.0)
 if offset_mm is None or offset_mm <= 0: exit()
 
 direction = "Port"
@@ -101,4 +101,4 @@ for obj_id in object_ids:
     layer_name = f"{obj_name} {suffix}"
     print(f"Processing: {obj_name}")
     slice_single_contour(obj_id, axis, offset_mm, direction, layer_name, color_rgb)
-    print("Single slice complete.\n")
+    print("Projection complete.\n")
