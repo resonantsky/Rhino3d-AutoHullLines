@@ -1,4 +1,4 @@
-# Rhino Singe v1.4 — Ra'anan Ynze de Jong — 2025
+# Rhino Single Hull Line — Ra'anan Ynze de Jong — 2025
 
 import rhinoscriptsyntax as rs
 import scriptcontext as sc
