@@ -1,4 +1,4 @@
-# Rhino AutoHullLines v1 — Ra'anan Ynze de Jong — 2025
+# Rhino Auto HullLines v1 — Ra'anan Ynze de Jong — 2025
 
 import rhinoscriptsyntax as rs
 import scriptcontext as sc
@@ -148,7 +148,7 @@ if not object_ids:
 axis = rs.GetString("Choose :", "Stations [X] : Buttocks [Y] : Waterlines [Z]", ["X", "Y", "Z"])
 if not axis: exit()
 
-step_mm = rs.GetReal("Enter default datum in millimeters", 1000.0, 1.0, 10000.0)
+step_mm = rs.GetReal("Enter default offset in millimeters", 1000.0, 1.0, 10000.0)
 if step_mm is None: exit()
 
 # Axis-specific layer and color
